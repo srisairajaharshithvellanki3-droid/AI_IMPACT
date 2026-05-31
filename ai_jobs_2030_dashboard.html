@@ -1,0 +1,480 @@
+
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: var(--font-sans); }
+  .db { padding: 0 0 2rem; }
+  .header { padding: 1.25rem 0 1rem; border-bottom: 0.5px solid var(--color-border-tertiary); margin-bottom: 1.25rem; }
+  .header h1 { font-size: 20px; font-weight: 500; color: var(--color-text-primary); }
+  .header p { font-size: 13px; color: var(--color-text-secondary); margin-top: 4px; }
+  .badges { display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap; }
+  .badge { font-size: 11px; padding: 3px 10px; border-radius: var(--border-radius-md); font-weight: 500; }
+  .badge-ok { background: var(--color-background-success); color: var(--color-text-success); }
+  .badge-info { background: var(--color-background-info); color: var(--color-text-info); }
+  .badge-warn { background: var(--color-background-warning); color: var(--color-text-warning); }
+  .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 10px; margin-bottom: 1.25rem; }
+  .kpi { background: var(--color-background-secondary); border-radius: var(--border-radius-md); padding: 14px 16px; }
+  .kpi-label { font-size: 11px; color: var(--color-text-secondary); text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 6px; }
+  .kpi-value { font-size: 22px; font-weight: 500; color: var(--color-text-primary); line-height: 1; }
+  .kpi-sub { font-size: 11px; color: var(--color-text-secondary); margin-top: 5px; }
+  .chart-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 14px; }
+  .chart-grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; margin-bottom: 14px; }
+  .chart-card { background: var(--color-background-primary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); padding: 16px; }
+  .chart-card.full { grid-column: 1 / -1; }
+  .card-title { font-size: 13px; font-weight: 500; color: var(--color-text-primary); margin-bottom: 4px; }
+  .card-sub { font-size: 11px; color: var(--color-text-secondary); margin-bottom: 12px; }
+  .legend { display: flex; flex-wrap: wrap; gap: 12px; margin-bottom: 10px; font-size: 11px; color: var(--color-text-secondary); }
+  .legend span { display: flex; align-items: center; gap: 5px; }
+  .legend-dot { width: 9px; height: 9px; border-radius: 2px; flex-shrink: 0; }
+  .tabs { display: flex; gap: 4px; margin-bottom: 12px; }
+  .tab { font-size: 12px; padding: 4px 12px; border-radius: var(--border-radius-md); border: 0.5px solid var(--color-border-tertiary); color: var(--color-text-secondary); cursor: pointer; background: transparent; }
+  .tab.active { background: var(--color-background-info); color: var(--color-text-info); border-color: transparent; }
+  .insight-box { background: var(--color-background-secondary); border-left: 2px solid #378ADD; border-radius: 0 var(--border-radius-md) var(--border-radius-md) 0; padding: 10px 14px; margin-top: 10px; font-size: 12px; color: var(--color-text-secondary); line-height: 1.6; }
+  .insight-box strong { color: var(--color-text-primary); font-weight: 500; }
+  .risk-bar-row { display: flex; align-items: center; gap: 8px; margin-bottom: 7px; }
+  .risk-bar-label { font-size: 11px; color: var(--color-text-secondary); width: 130px; flex-shrink: 0; text-align: right; }
+  .risk-bar-track { flex: 1; height: 7px; background: var(--color-background-secondary); border-radius: 4px; overflow: hidden; }
+  .risk-bar-fill { height: 100%; border-radius: 4px; }
+  .risk-bar-val { font-size: 11px; color: var(--color-text-primary); width: 34px; text-align: right; font-weight: 500; }
+  .filter-row { display: flex; align-items: center; gap: 8px; margin-bottom: 14px; flex-wrap: wrap; }
+  .filter-label { font-size: 12px; color: var(--color-text-secondary); }
+  select { font-size: 12px; padding: 4px 8px; border-radius: var(--border-radius-md); border: 0.5px solid var(--color-border-secondary); background: var(--color-background-primary); color: var(--color-text-primary); cursor: pointer; }
+  .grid-col1 { display: grid; grid-template-columns: 1fr; gap: 14px; margin-bottom: 14px; }
+  .donut-wrap { display: flex; align-items: center; gap: 16px; }
+  .donut-legend { flex: 1; }
+  .donut-legend-row { display: flex; align-items: center; justify-content: space-between; padding: 5px 0; border-bottom: 0.5px solid var(--color-border-tertiary); font-size: 12px; }
+  .donut-legend-row:last-child { border-bottom: none; }
+  .donut-legend-label { display: flex; align-items: center; gap: 6px; color: var(--color-text-secondary); }
+  .donut-legend-val { font-weight: 500; color: var(--color-text-primary); }
+</style>
+
+<div class="db">
+  <h2 class="sr-only">AI Impact on Jobs 2030 — interactive analysis dashboard covering 3,000 employee records across 10 industries and 10 countries.</h2>
+
+  <div class="header">
+    <h1>AI impact on jobs — 2030 outlook</h1>
+    <p>3,000 employee records · 20 job roles · 10 industries · 10 countries</p>
+    <div class="badges">
+      <span class="badge badge-ok">No missing values</span>
+      <span class="badge badge-ok">No duplicates found</span>
+      <span class="badge badge-info">3,000 rows · 20 columns</span>
+      <span class="badge badge-warn">Avg AI risk: 50.3%</span>
+    </div>
+  </div>
+
+  <div class="kpi-grid">
+    <div class="kpi">
+      <div class="kpi-label">Total records</div>
+      <div class="kpi-value">3,000</div>
+      <div class="kpi-sub">Clean · no dupes</div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-label">Avg salary</div>
+      <div class="kpi-value">$126.6K</div>
+      <div class="kpi-sub">Range $30K–$220K</div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-label">Avg AI risk</div>
+      <div class="kpi-value">50.3%</div>
+      <div class="kpi-sub">Spread 0.05–0.95</div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-label">Job growth 2030</div>
+      <div class="kpi-value">+17.2%</div>
+      <div class="kpi-sub">Avg across roles</div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-label">Need upskilling</div>
+      <div class="kpi-value">49.6%</div>
+      <div class="kpi-sub">1,489 of 3,000</div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-label">Remote/hybrid</div>
+      <div class="kpi-value">67%</div>
+      <div class="kpi-sub">1,003 remote · 1,011 hybrid</div>
+    </div>
+  </div>
+
+  <div class="chart-grid">
+    <div class="chart-card">
+      <div class="card-title">AI replacement risk by job role</div>
+      <div class="card-sub">Mean risk score (0–1) · all 20 roles</div>
+      <div style="position: relative; width: 100%; height: 280px;">
+        <canvas id="riskByJob" role="img" aria-label="Horizontal bar chart of AI replacement risk by job title. DevOps Engineer is highest at 0.57, UX Designer lowest at 0.46.">AI risk scores per job role from DevOps Engineer (0.57) down to UX Designer (0.46).</canvas>
+      </div>
+    </div>
+    <div class="chart-card">
+      <div class="card-title">Average salary by industry</div>
+      <div class="card-sub">USD · ranked high to low</div>
+      <div style="position: relative; width: 100%; height: 280px;">
+        <canvas id="salaryIndustry" role="img" aria-label="Horizontal bar chart of average salary by industry. Finance leads at $132K, Government lowest at $120K.">Finance $132K, Media $130K, Transportation $129K, Manufacturing $129K, Technology $128K, Energy $127K, Healthcare $126K, Education $124K, Retail $121K, Government $121K.</canvas>
+      </div>
+    </div>
+  </div>
+
+  <div class="chart-grid">
+    <div class="chart-card">
+      <div class="card-title">Hiring trend 2026</div>
+      <div class="card-sub">Distribution across all roles</div>
+      <div class="legend">
+        <span><span class="legend-dot" style="background:#1D9E75"></span>Growing 33.7%</span>
+        <span><span class="legend-dot" style="background:#378ADD"></span>Stable 33.7%</span>
+        <span><span class="legend-dot" style="background:#D85A30"></span>Declining 32.7%</span>
+      </div>
+      <div style="position: relative; width: 100%; height: 220px;">
+        <canvas id="hiringTrend" role="img" aria-label="Donut chart: Growing 33.7%, Stable 33.7%, Declining 32.7%.">Hiring trend: Growing 1010 (33.7%), Stable 1010 (33.7%), Declining 980 (32.7%).</canvas>
+      </div>
+    </div>
+    <div class="chart-card">
+      <div class="card-title">Automation level distribution</div>
+      <div class="card-sub">Count of employees by automation exposure</div>
+      <div class="legend">
+        <span><span class="legend-dot" style="background:#1D9E75"></span>Low 1,037</span>
+        <span><span class="legend-dot" style="background:#EF9F27"></span>Medium 1,011</span>
+        <span><span class="legend-dot" style="background:#E24B4A"></span>High 952</span>
+      </div>
+      <div style="position: relative; width: 100%; height: 220px;">
+        <canvas id="autoLevel" role="img" aria-label="Donut chart: Low automation 1037, Medium 1011, High 952.">Automation level: Low 1037, Medium 1011, High 952.</canvas>
+      </div>
+    </div>
+  </div>
+
+  <div class="chart-grid">
+    <div class="chart-card full">
+      <div class="card-title">Job growth 2030 by industry</div>
+      <div class="card-sub">Mean projected % growth · Finance and Government lead</div>
+      <div style="position: relative; width: 100%; height: 200px;">
+        <canvas id="growthIndustry" role="img" aria-label="Bar chart of job growth by industry. Finance leads at 18.6%, Transportation lowest at 15.9%.">Finance 18.6%, Government 18.3%, Technology 18.0%, Education 17.9%, Media 17.6%, Energy 17.1%, Retail 16.5%, Manufacturing 16.4%, Healthcare 15.9%, Transportation 15.9%.</canvas>
+      </div>
+    </div>
+  </div>
+
+  <div class="chart-grid">
+    <div class="chart-card">
+      <div class="card-title">Salary by education level</div>
+      <div class="card-sub">Avg salary USD · counterintuitive result</div>
+      <div style="position: relative; width: 100%; height: 220px;">
+        <canvas id="salaryEdu" role="img" aria-label="Bar chart of salary by education. High School earns $128.5K, Bachelor $128K, PhD $125.2K, Master $124.8K.">Salary by education: High School $128,510, Bachelor $128,002, PhD $125,193, Master $124,825.</canvas>
+      </div>
+      <div class="insight-box">
+        <strong>Interesting:</strong> High school and bachelor holders out-earn PhDs on average — likely due to trade and tech roles skewing industry salaries.
+      </div>
+    </div>
+    <div class="chart-card">
+      <div class="card-title">AI tool usage vs performance</div>
+      <div class="card-sub">Mean performance score (0–5)</div>
+      <div style="position: relative; width: 100%; height: 220px;">
+        <canvas id="toolPerf" role="img" aria-label="Bar chart: High AI tool usage = 3.53, Moderate = 3.51, Low = 3.50 performance score.">Performance by AI tool usage: High 3.53, Moderate 3.51, Low 3.50.</canvas>
+      </div>
+      <div class="insight-box">
+        <strong>Takeaway:</strong> AI tool usage has minimal impact on raw performance score — the gap across Low/Moderate/High is only 0.03 points.
+      </div>
+    </div>
+  </div>
+
+  <div class="chart-grid">
+    <div class="chart-card full">
+      <div class="card-title">Workforce by country</div>
+      <div class="card-sub">Number of employees in dataset by country</div>
+      <div style="position: relative; width: 100%; height: 200px;">
+        <canvas id="countryDist" role="img" aria-label="Bar chart of workforce distribution by country. UAE leads with 347, Singapore lowest at 267.">UAE 347, Germany 318, Australia 312, Pakistan 300, Japan 299, UK 298, USA 295, Canada 285, India 279, Singapore 267.</canvas>
+      </div>
+    </div>
+  </div>
+
+  <div class="chart-grid">
+    <div class="chart-card">
+      <div class="card-title">Remote work possibility</div>
+      <div class="card-sub">Breakdown across 3,000 employees</div>
+      <div class="legend">
+        <span><span class="legend-dot" style="background:#378ADD"></span>Hybrid 33.7%</span>
+        <span><span class="legend-dot" style="background:#1D9E75"></span>Yes 33.4%</span>
+        <span><span class="legend-dot" style="background:#888780"></span>No 32.9%</span>
+      </div>
+      <div style="position: relative; width: 100%; height: 200px;">
+        <canvas id="remoteWork" role="img" aria-label="Donut chart: Hybrid 33.7%, Yes 33.4%, No 32.9%.">Remote work: Hybrid 1011, Yes 1003, No 986.</canvas>
+      </div>
+    </div>
+    <div class="chart-card">
+      <div class="card-title">Upskilling need by automation level</div>
+      <div class="card-sub">% of employees requiring upskilling</div>
+      <div style="position: relative; width: 100%; height: 200px;">
+        <canvas id="upskillAuto" role="img" aria-label="Bar chart: High automation 51.6% need upskilling, Medium 49.8%, Low 47.7%.">Upskilling need: High automation 51.6%, Medium 49.8%, Low 47.7%.</canvas>
+      </div>
+      <div class="insight-box">
+        <strong>Key finding:</strong> Even in low-automation roles, nearly half need upskilling — AI pressure is universal.
+      </div>
+    </div>
+  </div>
+
+  <div class="chart-card" style="margin-bottom: 14px;">
+    <div class="card-title">Top 10 jobs by avg AI replacement risk</div>
+    <div class="card-sub">Higher score = greater automation risk</div>
+    <div style="margin-top: 8px;">
+      <div class="risk-bar-row">
+        <div class="risk-bar-label">DevOps Engineer</div>
+        <div class="risk-bar-track"><div class="risk-bar-fill" style="width:59.9%;background:#E24B4A;"></div></div>
+        <div class="risk-bar-val">0.57</div>
+      </div>
+      <div class="risk-bar-row">
+        <div class="risk-bar-label">Cloud Architect</div>
+        <div class="risk-bar-track"><div class="risk-bar-fill" style="width:59.4%;background:#E24B4A;"></div></div>
+        <div class="risk-bar-val">0.56</div>
+      </div>
+      <div class="risk-bar-row">
+        <div class="risk-bar-label">IoT Specialist</div>
+        <div class="risk-bar-track"><div class="risk-bar-fill" style="width:55.5%;background:#EF9F27;"></div></div>
+        <div class="risk-bar-val">0.53</div>
+      </div>
+      <div class="risk-bar-row">
+        <div class="risk-bar-label">Prompt Engineer</div>
+        <div class="risk-bar-track"><div class="risk-bar-fill" style="width:54.9%;background:#EF9F27;"></div></div>
+        <div class="risk-bar-val">0.52</div>
+      </div>
+      <div class="risk-bar-row">
+        <div class="risk-bar-label">Teacher</div>
+        <div class="risk-bar-track"><div class="risk-bar-fill" style="width:54.7%;background:#EF9F27;"></div></div>
+        <div class="risk-bar-val">0.52</div>
+      </div>
+      <div class="risk-bar-row">
+        <div class="risk-bar-label">Healthcare Analyst</div>
+        <div class="risk-bar-track"><div class="risk-bar-fill" style="width:54.5%;background:#EF9F27;"></div></div>
+        <div class="risk-bar-val">0.52</div>
+      </div>
+      <div class="risk-bar-row">
+        <div class="risk-bar-label">Data Engineer</div>
+        <div class="risk-bar-track"><div class="risk-bar-fill" style="width:54.4%;background:#EF9F27;"></div></div>
+        <div class="risk-bar-val">0.52</div>
+      </div>
+      <div class="risk-bar-row">
+        <div class="risk-bar-label">Cybersecurity Analyst</div>
+        <div class="risk-bar-track"><div class="risk-bar-fill" style="width:53.7%;background:#EF9F27;"></div></div>
+        <div class="risk-bar-val">0.51</div>
+      </div>
+      <div class="risk-bar-row">
+        <div class="risk-bar-label">Robotics Engineer</div>
+        <div class="risk-bar-track"><div class="risk-bar-fill" style="width:53.4%;background:#EF9F27;"></div></div>
+        <div class="risk-bar-val">0.51</div>
+      </div>
+      <div class="risk-bar-row">
+        <div class="risk-bar-label">Blockchain Developer</div>
+        <div class="risk-bar-track"><div class="risk-bar-fill" style="width:53.3%;background:#EF9F27;"></div></div>
+        <div class="risk-bar-val">0.51</div>
+      </div>
+    </div>
+    <div class="insight-box" style="margin-top: 14px;">
+      <strong>Paradox alert:</strong> Prompt Engineers and Cloud Architects — roles built around AI — rank among the highest replacement risks, suggesting AI is cannibalising its own enabling workforce.
+    </div>
+  </div>
+
+  <div class="chart-card">
+    <div class="card-title">Company size composition</div>
+    <div class="card-sub">Distribution across 3,000 employees</div>
+    <div class="legend">
+      <span><span class="legend-dot" style="background:#7F77DD"></span>Medium 34.2%</span>
+      <span><span class="legend-dot" style="background:#378ADD"></span>Enterprise 33.0%</span>
+      <span><span class="legend-dot" style="background:#1D9E75"></span>Startup 32.8%</span>
+    </div>
+    <div style="position: relative; width: 100%; height: 180px;">
+      <canvas id="companySize" role="img" aria-label="Donut chart: Medium company 1025, Enterprise 990, Startup 985.">Company size: Medium 1025, Enterprise 990, Startup 985.</canvas>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script>
+const isDark = matchMedia('(prefers-color-scheme: dark)').matches;
+const gridColor = isDark ? 'rgba(255,255,255,0.07)' : 'rgba(0,0,0,0.06)';
+const tickColor = isDark ? '#888780' : '#888780';
+
+const baseOpts = {
+  responsive: true,
+  maintainAspectRatio: false,
+  plugins: { legend: { display: false } },
+  scales: {
+    x: { grid: { color: gridColor }, ticks: { color: tickColor, font: { size: 11 } } },
+    y: { grid: { color: gridColor }, ticks: { color: tickColor, font: { size: 11 } } }
+  }
+};
+
+new Chart(document.getElementById('riskByJob'), {
+  type: 'bar',
+  data: {
+    labels: ['DevOps Eng.','Cloud Arch.','IoT Spec.','Prompt Eng.','Teacher','Health Analyst','Data Eng.','Cyber Analyst','Robotics Eng.','Blockchain Dev.','Software Dev.','HR Specialist','Digital Mktg','Product Mgr','Fin. Analyst','AI Engineer','Business Analyst','ML Engineer','Data Scientist','UX Designer'],
+    datasets: [{
+      label: 'AI Risk',
+      data: [0.569,0.564,0.527,0.522,0.52,0.518,0.517,0.51,0.507,0.506,0.497,0.492,0.489,0.486,0.485,0.476,0.473,0.472,0.47,0.46],
+      backgroundColor: (ctx) => {
+        const v = ctx.raw;
+        return v >= 0.55 ? '#E24B4A' : v >= 0.50 ? '#EF9F27' : '#1D9E75';
+      },
+      borderRadius: 3,
+      borderSkipped: false
+    }]
+  },
+  options: { ...baseOpts, indexAxis: 'y',
+    scales: {
+      x: { min: 0.4, max: 0.62, grid: { color: gridColor }, ticks: { color: tickColor, font: { size: 11 }, callback: v => v.toFixed(2) } },
+      y: { grid: { display: false }, ticks: { color: tickColor, font: { size: 10 } } }
+    }
+  }
+});
+
+new Chart(document.getElementById('salaryIndustry'), {
+  type: 'bar',
+  data: {
+    labels: ['Finance','Media','Transport','Manufac.','Technology','Energy','Healthcare','Education','Retail','Government'],
+    datasets: [{
+      label: 'Avg Salary',
+      data: [132017,129685,129411,128614,127689,127261,125682,124410,121075,120626],
+      backgroundColor: '#378ADD',
+      borderRadius: 3,
+      borderSkipped: false
+    }]
+  },
+  options: { ...baseOpts, indexAxis: 'y',
+    scales: {
+      x: { min: 115000, max: 140000, grid: { color: gridColor }, ticks: { color: tickColor, font: { size: 11 }, callback: v => '$' + Math.round(v/1000) + 'K' } },
+      y: { grid: { display: false }, ticks: { color: tickColor, font: { size: 11 } } }
+    }
+  }
+});
+
+new Chart(document.getElementById('hiringTrend'), {
+  type: 'doughnut',
+  data: {
+    labels: ['Growing','Stable','Declining'],
+    datasets: [{ data: [1010,1010,980], backgroundColor: ['#1D9E75','#378ADD','#D85A30'], borderWidth: 0, hoverOffset: 4 }]
+  },
+  options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, cutout: '65%' }
+});
+
+new Chart(document.getElementById('autoLevel'), {
+  type: 'doughnut',
+  data: {
+    labels: ['Low','Medium','High'],
+    datasets: [{ data: [1037,1011,952], backgroundColor: ['#1D9E75','#EF9F27','#E24B4A'], borderWidth: 0, hoverOffset: 4 }]
+  },
+  options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, cutout: '65%' }
+});
+
+new Chart(document.getElementById('growthIndustry'), {
+  type: 'bar',
+  data: {
+    labels: ['Finance','Government','Technology','Education','Media','Energy','Retail','Manufac.','Healthcare','Transport'],
+    datasets: [{
+      label: 'Job Growth %',
+      data: [18.57,18.28,18.01,17.88,17.64,17.09,16.52,16.39,15.88,15.87],
+      backgroundColor: (ctx) => {
+        const v = ctx.raw;
+        return v >= 18 ? '#1D9E75' : v >= 17 ? '#378ADD' : '#888780';
+      },
+      borderRadius: 3,
+      borderSkipped: false
+    }]
+  },
+  options: { ...baseOpts,
+    scales: {
+      x: { grid: { display: false }, ticks: { color: tickColor, font: { size: 11 } } },
+      y: { min: 14, max: 20, grid: { color: gridColor }, ticks: { color: tickColor, font: { size: 11 }, callback: v => v + '%' } }
+    }
+  }
+});
+
+new Chart(document.getElementById('salaryEdu'), {
+  type: 'bar',
+  data: {
+    labels: ['High School','Bachelor','PhD','Master'],
+    datasets: [{
+      label: 'Avg Salary',
+      data: [128510,128002,125193,124825],
+      backgroundColor: ['#7F77DD','#378ADD','#1D9E75','#EF9F27'],
+      borderRadius: 4,
+      borderSkipped: false
+    }]
+  },
+  options: { ...baseOpts,
+    scales: {
+      x: { grid: { display: false }, ticks: { color: tickColor, font: { size: 12 } } },
+      y: { min: 120000, max: 132000, grid: { color: gridColor }, ticks: { color: tickColor, font: { size: 11 }, callback: v => '$' + Math.round(v/1000) + 'K' } }
+    }
+  }
+});
+
+new Chart(document.getElementById('toolPerf'), {
+  type: 'bar',
+  data: {
+    labels: ['High','Moderate','Low'],
+    datasets: [{
+      label: 'Performance',
+      data: [3.529,3.512,3.503],
+      backgroundColor: ['#1D9E75','#378ADD','#888780'],
+      borderRadius: 4,
+      borderSkipped: false
+    }]
+  },
+  options: { ...baseOpts,
+    scales: {
+      x: { grid: { display: false }, ticks: { color: tickColor, font: { size: 12 } } },
+      y: { min: 3.40, max: 3.60, grid: { color: gridColor }, ticks: { color: tickColor, font: { size: 11 }, callback: v => v.toFixed(2) } }
+    }
+  }
+});
+
+new Chart(document.getElementById('countryDist'), {
+  type: 'bar',
+  data: {
+    labels: ['UAE','Germany','Australia','Pakistan','Japan','UK','USA','Canada','India','Singapore'],
+    datasets: [{
+      label: 'Employees',
+      data: [347,318,312,300,299,298,295,285,279,267],
+      backgroundColor: '#7F77DD',
+      borderRadius: 3,
+      borderSkipped: false
+    }]
+  },
+  options: { ...baseOpts,
+    scales: {
+      x: { grid: { display: false }, ticks: { color: tickColor, font: { size: 11 } } },
+      y: { min: 240, max: 370, grid: { color: gridColor }, ticks: { color: tickColor, font: { size: 11 } } }
+    }
+  }
+});
+
+new Chart(document.getElementById('remoteWork'), {
+  type: 'doughnut',
+  data: {
+    labels: ['Hybrid','Yes','No'],
+    datasets: [{ data: [1011,1003,986], backgroundColor: ['#378ADD','#1D9E75','#888780'], borderWidth: 0, hoverOffset: 4 }]
+  },
+  options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, cutout: '65%' }
+});
+
+new Chart(document.getElementById('upskillAuto'), {
+  type: 'bar',
+  data: {
+    labels: ['High automation','Medium automation','Low automation'],
+    datasets: [{
+      label: 'Upskilling needed %',
+      data: [51.6,49.8,47.7],
+      backgroundColor: ['#E24B4A','#EF9F27','#1D9E75'],
+      borderRadius: 4,
+      borderSkipped: false
+    }]
+  },
+  options: { ...baseOpts,
+    scales: {
+      x: { grid: { display: false }, ticks: { color: tickColor, font: { size: 11 } } },
+      y: { min: 40, max: 58, grid: { color: gridColor }, ticks: { color: tickColor, font: { size: 11 }, callback: v => v + '%' } }
+    }
+  }
+});
+
+new Chart(document.getElementById('companySize'), {
+  type: 'doughnut',
+  data: {
+    labels: ['Medium','Enterprise','Startup'],
+    datasets: [{ data: [1025,990,985], backgroundColor: ['#7F77DD','#378ADD','#1D9E75'], borderWidth: 0, hoverOffset: 4 }]
+  },
+  options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, cutout: '65%' }
+});
+</script>
